@@ -215,7 +215,7 @@ export class AuthController {
 
   @Get('/signin/google/callback')
   @UseSessions({
-    cookie: true,
+    location: 'token-in-cookie',
   })
   async handleGoogleRedirection(ctx: Context<User>) {
     const { userInfo } = await this.google.getUserInfo<{ email: string }>(ctx);

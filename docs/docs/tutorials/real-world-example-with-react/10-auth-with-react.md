@@ -51,7 +51,7 @@ import { Context } from '@foal/core';
 // ...
 
 @UseSessions({
-  cookie: true,
+  location: 'token-in-cookie',
   user: fetchUser(User),
   userCookie: (ctx) => ctx.user ? JSON.stringify({ id: ctx.user.id, name: ctx.user.name }) : '',
 })

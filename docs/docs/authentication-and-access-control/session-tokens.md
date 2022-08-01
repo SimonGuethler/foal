@@ -316,7 +316,7 @@ When using the `@UseSessions` hook with the `cookie` option, FoalTS makes sure t
 ```typescript
 import { Context, dependency, Get, HttpResponseOK, Post, Store, UseSessions } from '@foal/core';
 
-@UseSessions({ cookie: true })
+@UseSessions({ location: 'token-in-cookie' })
 export class ApiController {
 
   @dependency
@@ -345,7 +345,7 @@ If the session has expired, the hook returns a 401 error. If you want to redirec
 
 ```typescript
 @UseSessions({
-  cookie: true,
+  location: 'token-in-cookie',
   redirectTo: '/login'
 })
 export class ApiController {
@@ -503,7 +503,7 @@ function userToJSON(user: User|null) {
 }
 
 @UseSessions({
-  cookie: true,
+  location: 'token-in-cookie',
   user: fetchUser(User),
   userCookie: (ctx, services) => userToJSON(ctx.user as User|null)
 })
@@ -920,7 +920,7 @@ export class ApiController {
   store: Store;
 
   @Post('/login')
-  @UseSessions({ cookie: true, create: false })
+  @UseSessions({ location: 'token-in-cookie', create: false })
   async login(ctx: Context) {
     // Check the credentials...
 
@@ -1014,7 +1014,7 @@ import { Get, HttpResponseOK, UseSessions } from '@foal/core';
 export class ApiController {
 
   @Get('/products')
-  @UseSessions({ cookie: true, required: true })
+  @UseSessions({ location: 'token-in-cookie', required: true })
   readProducts() {
     return new HttpResponseOK([]);
   }

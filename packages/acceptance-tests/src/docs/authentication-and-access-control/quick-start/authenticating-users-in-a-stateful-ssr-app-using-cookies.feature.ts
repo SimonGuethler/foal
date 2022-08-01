@@ -114,7 +114,7 @@ describe('Feature: Authenticating users in a statefull SSR application using coo
   }
 
   @UseSessions({
-    cookie: true,
+    location: 'token-in-cookie',
     user: fetchUser(User)
   })
   class AppController implements IAppController {

@@ -295,7 +295,7 @@ describe('Feature: Adding authentication and access control', () => {
     }
 
     @UseSessions({
-      cookie: true,
+      location: 'token-in-cookie',
       user: fetchUser(User),
       userCookie: (ctx, services) => userToJSON(ctx.user as User|null)
     })

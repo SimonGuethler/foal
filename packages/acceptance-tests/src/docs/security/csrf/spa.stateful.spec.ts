@@ -37,7 +37,7 @@ describe('Feature: Stateful CSRF protection in a Single-Page Application', () =>
     @Post('/login')
     @ValidateBody(credentialsSchema)
     @UseSessions({
-      cookie: true,
+      location: 'token-in-cookie',
       required: false,
       // Nothing in documentation
       store: TypeORMStore,
@@ -62,7 +62,7 @@ describe('Feature: Stateful CSRF protection in a Single-Page Application', () =>
 
   // api.controller.ts
   @UseSessions({
-    cookie: true,
+    location: 'token-in-cookie',
     required: true,
     // Nothing in documentation
     store: TypeORMStore,

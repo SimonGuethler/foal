@@ -38,7 +38,7 @@ describe('Feature: Stateful CSRF protection in a Regular Web App', () => {
     @Post('/login')
     @ValidateBody(credentialsSchema)
     @UseSessions({
-      cookie: true,
+      location: 'token-in-cookie',
       required: false,
       // Nothing in documentation
       store: TypeORMStore,
@@ -74,7 +74,7 @@ describe('Feature: Stateful CSRF protection in a Regular Web App', () => {
 
     @Get('/products')
     @UseSessions({
-      cookie: true,
+      location: 'token-in-cookie',
       redirectTo: '/login',
       required: true,
       // Nothing in documentation
@@ -92,7 +92,7 @@ describe('Feature: Stateful CSRF protection in a Regular Web App', () => {
 
   // api.controller.ts
   @UseSessions({
-    cookie: true,
+    location: 'token-in-cookie',
     redirectTo: '/login',
     required: true,
     // Nothing in documentation

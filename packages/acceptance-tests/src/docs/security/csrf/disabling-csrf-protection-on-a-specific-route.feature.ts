@@ -33,14 +33,14 @@ describe('Feature: Disabling CSRF protection on a specific route.', () => {
 
     class ApiController {
       @Post('/foo')
-      @UseSessions({ cookie: true })
+      @UseSessions({ location: 'token-in-cookie' })
       foo() {
         // This method has the CSRF protection enabled.
         return new HttpResponseOK();
       }
 
       @Post('/bar')
-      @UseSessions({ cookie: true, csrf: false })
+      @UseSessions({ location: 'token-in-cookie', csrf: false })
       bar() {
         // This method does not have the CSRF protection enabled.
         return new HttpResponseOK();
@@ -55,7 +55,7 @@ describe('Feature: Disabling CSRF protection on a specific route.', () => {
       ];
 
       @Get('/')
-      @UseSessions({ cookie: true })
+      @UseSessions({ location: 'token-in-cookie' })
       index() {
         return new HttpResponseOK();
       }

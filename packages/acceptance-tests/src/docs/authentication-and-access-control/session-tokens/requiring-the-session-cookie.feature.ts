@@ -31,7 +31,7 @@ describe('Feature: Requiring the session cookie', async () => {
     class ApiController {
 
       @Get('/products')
-      @UseSessions({ cookie: true, required: true })
+      @UseSessions({ location: 'token-in-cookie', required: true })
       readProducts() {
         return new HttpResponseOK([]);
       }

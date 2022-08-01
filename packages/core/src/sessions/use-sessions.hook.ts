@@ -29,7 +29,7 @@ import { setSessionCookie } from './set-session-cookie';
 export interface UseSessionOptions {
   user?: FetchUser;
   store?: Class<SessionStore>;
-  cookie?: boolean;
+  location?: 'token-in-header'|'token-in-cookie',
   csrf?: boolean;
   redirectTo?: string;
   openapi?: boolean;
@@ -68,7 +68,7 @@ export function UseSessions(options: UseSessionOptions = {}): HookDecorator {
       }
 
       if (ctx.session.isDestroyed) {
-        if (options.cookie) {
+        if (options.location === 'token-in-cookie') {
           removeSessionCookie(response, !!options.userCookie);
         }
         return;
@@ -76,7 +76,7 @@ export function UseSessions(options: UseSessionOptions = {}): HookDecorator {
 
       await ctx.session.commit();
 
-      if (options.cookie) {
+      if (options.location === 'token-in-cookie') {
         const userCookie = options.userCookie ? await options.userCookie(ctx, services) : undefined;
         setSessionCookie(response, ctx.session, userCookie);
       }
@@ -87,7 +87,7 @@ export function UseSessions(options: UseSessionOptions = {}): HookDecorator {
     let sessionID: string|undefined;
 
     try {
-      sessionID = getSessionIdFromRequest(ctx.request, options.cookie ? 'token-in-cookie' : 'token-in-header', !!options.required);
+      sessionID = getSessionIdFromRequest(ctx.request, options.location || 'token-in-header', !!options.required);
     } catch (error) {
       if (error instanceof RequestValidationError) {
         return badRequestOrRedirect(error.message);
@@ -97,7 +97,7 @@ export function UseSessions(options: UseSessionOptions = {}): HookDecorator {
     }
 
     if (!sessionID) {
-      if (options.create ?? options.cookie) {
+      if (options.create ?? options.location === 'token-in-cookie') {
         ctx.session = await createSession(store);
       }
       return postFunction;
@@ -109,7 +109,7 @@ export function UseSessions(options: UseSessionOptions = {}): HookDecorator {
 
     if (!session) {
       const response = unauthorizedOrRedirect('token invalid or expired');
-      if (options.cookie) {
+      if (options.location === 'token-in-cookie') {
         removeSessionCookie(response, !!options.userCookie);
       }
       return response;
@@ -118,7 +118,7 @@ export function UseSessions(options: UseSessionOptions = {}): HookDecorator {
     /* Verify CSRF token */
 
     if (
-      options.cookie &&
+      options.location === 'token-in-cookie' &&
       (options.csrf ?? Config.get('settings.session.csrf.enabled', 'boolean', false)) &&
       ![ 'GET', 'HEAD', 'OPTIONS' ].includes(ctx.request.method)
     ) {
@@ -148,7 +148,7 @@ export function UseSessions(options: UseSessionOptions = {}): HookDecorator {
       if (!ctx.user) {
         await session.destroy();
         const response = unauthorizedOrRedirect('The token does not match any user.');
-        if (options.cookie) {
+        if (options.location === 'token-in-cookie') {
           removeSessionCookie(response, !!options.userCookie);
         }
         return response;
@@ -164,7 +164,7 @@ export function UseSessions(options: UseSessionOptions = {}): HookDecorator {
       ApiResponse(401, { description: 'Auth token is invalid.' })
   ];
 
-  if (options.cookie) {
+  if (options.location === 'token-in-cookie') {
     const securityScheme: IApiSecurityScheme = {
       in: 'cookie',
       name: Config.get('settings.session.cookie.name', 'string', SESSION_DEFAULT_COOKIE_NAME),

@@ -46,7 +46,7 @@ describe('Feature: Using cookies', () => {
 
     /* ======================= DOCUMENTATION BEGIN ======================= */
 
-    @UseSessions({ cookie: true })
+    @UseSessions({ location: 'token-in-cookie' })
     class ApiController {
 
       @dependency
@@ -112,7 +112,7 @@ describe('Feature: Using cookies', () => {
     /* ======================= DOCUMENTATION BEGIN ======================= */
 
     @UseSessions({
-      cookie: true,
+      location: 'token-in-cookie',
       redirectTo: '/login'
     })
     class ApiController {

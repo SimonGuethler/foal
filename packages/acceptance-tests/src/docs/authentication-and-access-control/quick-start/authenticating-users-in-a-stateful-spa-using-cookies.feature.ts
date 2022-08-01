@@ -108,7 +108,7 @@ describe('Feature: Authenticating users in a stateful SPA using cookies', () => 
   }
 
   @UseSessions({
-    cookie: true,
+    location: 'token-in-cookie',
     user: fetchUser(User)
   })
   class AppController implements IAppController {

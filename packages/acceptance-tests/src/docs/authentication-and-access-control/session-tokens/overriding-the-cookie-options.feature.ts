@@ -34,7 +34,7 @@ describe('Feature: Overriding the cookie options', async () => {
   });
 
   it('Example: Override all options.', async () => {
-    @UseSessions({ cookie: true })
+    @UseSessions({ location: 'token-in-cookie' })
     class AppController {
 
       @Get('/')

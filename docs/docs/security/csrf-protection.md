@@ -155,7 +155,7 @@ export class AuthController {
   @Post('/login')
   @ValidateBody(credentialsSchema)
   @UseSessions({
-    cookie: true,
+    location: 'token-in-cookie',
     required: false,
   })
   async login(ctx: Context) {
@@ -182,7 +182,7 @@ export class AuthController {
 import { HttpResponseCreated, UseSessions } from '@foal/core';
 
 @UseSessions({
-  cookie: true,
+  location: 'token-in-cookie',
   required: true,
 })
 export class ApiController {
@@ -345,7 +345,7 @@ export class AuthController {
   @Post('/login')
   @ValidateBody(credentialsSchema)
   @UseSessions({
-    cookie: true,
+    location: 'token-in-cookie',
     required: false,
   })
   async login(ctx: Context) {
@@ -389,7 +389,7 @@ export class ViewController {
 
   @Get('/products')
   @UseSessions({
-    cookie: true,
+    location: 'token-in-cookie',
     required: true,
     redirectTo: '/login'
   })
@@ -408,7 +408,7 @@ export class ViewController {
 import { HttpResponseRedirect, UseSessions } from '@foal/core';
 
 @UseSessions({
-  cookie: true,
+  location: 'token-in-cookie',
   required: true,
   redirectTo: '/login'
 })
@@ -533,14 +533,14 @@ import { HttpResponseOK, Post, UseSessions } from '@foal/core';
 
 export class ApiController {
   @Post('/foo')
-  @UseSessions({ cookie: true })
+  @UseSessions({ location: 'token-in-cookie' })
   foo() {
     // This method has the CSRF protection enabled.
     return new HttpResponseOK();
   }
 
   @Post('/bar')
-  @UseSessions({ cookie: true, csrf: false })
+  @UseSessions({ location: 'token-in-cookie', csrf: false })
   bar() {
     // This method does not have the CSRF protection enabled.
     return new HttpResponseOK();

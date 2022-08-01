@@ -48,7 +48,7 @@ describe('Feature: Do not Auto-Create the Session when using sessions with cooki
       store: Store;
 
       @Post('/login')
-      @UseSessions({ cookie: true, create: false })
+      @UseSessions({ location: 'token-in-cookie', create: false })
       async login(ctx: Context) {
         // Check the credentials...
 

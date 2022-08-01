@@ -34,7 +34,7 @@ import { readSession } from './read-session';
 import { Session } from './session';
 import { SessionState } from './session-state.interface';
 import { SessionStore } from './session-store';
-import { UseSessions } from './use-sessions.hook';
+import { UseSessionOptions, UseSessions } from './use-sessions.hook';
 
 describe('UseSessions', () => {
 
@@ -146,7 +146,7 @@ describe('UseSessions', () => {
 
   describe('should validate the request and', () => {
 
-    context('given options.cookie is false or not defined', () => {
+    context('given options.location equals "token-in-header" or is not defined', () => {
 
       context('given the Authorization header does not exist', () => {
 
@@ -270,9 +270,9 @@ describe('UseSessions', () => {
 
     });
 
-    context('given options.cookie is true', () => {
+    context('given options.location equals "token-in-cookie"', () => {
 
-      beforeEach(() => hook = getHookFunction(UseSessions({ store: Store, cookie: true })));
+      beforeEach(() => hook = getHookFunction(UseSessions({ store: Store, location: 'token-in-cookie' })));
 
       context('given the cookie does not exist', () => {
 
@@ -304,7 +304,7 @@ describe('UseSessions', () => {
 
           context('given options.create is false', async () => {
 
-            beforeEach(() => hook = getHookFunction(UseSessions({ store: Store, cookie: true, create: false })));
+            beforeEach(() => hook = getHookFunction(UseSessions({ store: Store, location: 'token-in-cookie', create: false })));
 
             it('should let ctx.session equal null.', async () => {
               await hook(ctx, services);
@@ -316,7 +316,7 @@ describe('UseSessions', () => {
 
           context('given options.create is true', async () => {
 
-            beforeEach(() => hook = getHookFunction(UseSessions({ store: Store, cookie: true, create: true })));
+            beforeEach(() => hook = getHookFunction(UseSessions({ store: Store, location: 'token-in-cookie', create: true })));
 
             it('should create a new session and assign it to ctx.session.', async () => {
               await hook(ctx, services);
@@ -332,7 +332,7 @@ describe('UseSessions', () => {
 
         context('given options.required is true', () => {
 
-          beforeEach(() => hook = getHookFunction(UseSessions({ store: Store, cookie: true, required: true })));
+          beforeEach(() => hook = getHookFunction(UseSessions({ store: Store, location: 'token-in-cookie', required: true })));
 
           context('given options.redirectTo is not defined', () => {
 
@@ -353,7 +353,7 @@ describe('UseSessions', () => {
           context('given options.redirectTo is defined', () => {
 
             beforeEach(() => hook = getHookFunction(UseSessions({
-              cookie: true,
+              location: 'token-in-cookie',
               redirectTo: '/foo',
               required: true,
               store: Store,
@@ -417,7 +417,7 @@ describe('UseSessions', () => {
 
     });
 
-    context('given options.cookie is false or not defined', () => {
+    context('given options.location equals "token-in-header" or is not defined', () => {
 
       it('should not set a cookie in the response if no session matching the ID is found.', async () => {
         const response = await hook(ctx, services);
@@ -429,10 +429,10 @@ describe('UseSessions', () => {
 
     });
 
-    context('given options.cookie is true and no session matching the ID is found', () => {
+    context('given options.location equals "token-in-cookie" and no session matching the ID is found', () => {
 
       beforeEach(() => {
-        hook = getHookFunction(UseSessions({ store: Store, cookie: true }));
+        hook = getHookFunction(UseSessions({ store: Store, location: 'token-in-cookie' }));
         ctx = createContext(
           {},
           {
@@ -455,7 +455,7 @@ describe('UseSessions', () => {
       context('given userCookie is defined', () => {
 
         beforeEach(() => {
-          hook = getHookFunction(UseSessions({ store: Store, cookie: true, userCookie: () => '' }));
+          hook = getHookFunction(UseSessions({ store: Store, location: 'token-in-cookie', userCookie: () => '' }));
         });
 
         it('should remove the "user" cookie', async () => {
@@ -499,7 +499,7 @@ describe('UseSessions', () => {
 
       afterEach(() => Config.remove('settings.session.csrf.enabled'));
 
-      context('given options.cookie is false or not defined', () => {
+      context('given options.location equals "token-in-header" or is not defined', () => {
 
         beforeEach(() => ctx = createContext({ Authorization: `Bearer ${csrfSessionID}`}, {}, {}, 'POST'));
 
@@ -512,11 +512,11 @@ describe('UseSessions', () => {
 
       });
 
-      context('given options.cookie is true', () => {
+      context('given options.location equals "token-in-cookie"', () => {
 
         context('given options.csrf is false', () => {
 
-          beforeEach(() => hook = getHookFunction(UseSessions({ store: Store, cookie: true, csrf: false })));
+          beforeEach(() => hook = getHookFunction(UseSessions({ store: Store, location: 'token-in-cookie', csrf: false })));
 
           it('should NOT return an HttpResponseForbidden instance if the request has no CSRF token.', async () => {
             ctx = createContext({}, { [SESSION_DEFAULT_COOKIE_NAME]: csrfSessionID }, {}, 'POST');
@@ -530,7 +530,7 @@ describe('UseSessions', () => {
 
         context('given options.csrf is undefined', () => {
 
-          beforeEach(() => hook = getHookFunction(UseSessions({ store: Store, cookie: true })));
+          beforeEach(() => hook = getHookFunction(UseSessions({ store: Store, location: 'token-in-cookie' })));
 
           function testUnprotectedMethod(method: HttpMethod) {
             it('should not return an HttpResponseForbidden instance if the request has no CSRF token.', async () => {
@@ -679,7 +679,7 @@ describe('UseSessions', () => {
       Config.set('settings.session.cookie.name', 'auth2');
 
       ctx = createContext({}, { auth2: anonymousSessionID });
-      hook = getHookFunction(UseSessions({ store: Store, cookie: true }));
+      hook = getHookFunction(UseSessions({ store: Store, location: 'token-in-cookie' }));
 
       await hook(ctx, services);
 
@@ -764,7 +764,7 @@ describe('UseSessions', () => {
             strictEqual(ctx.session?.isDestroyed, true);
           });
 
-          context('given options.cookie is false or not defined', () => {
+          context('given options.location equals "token-in-header" or is not defined', () => {
 
             it(
               'with the null value and should not remove a session cookie in the response '
@@ -783,10 +783,10 @@ describe('UseSessions', () => {
 
           });
 
-          context('given options.cookie is true', () => {
+          context('given options.location equals "token-in-cookie"', () => {
 
             beforeEach(() => {
-              hook = getHookFunction(UseSessions({ store: Store, user: fetchUser, cookie: true }));
+              hook = getHookFunction(UseSessions({ store: Store, user: fetchUser, location: 'token-in-cookie' }));
               const token = ctx.request.get('Authorization');
               if (token) {
                 ctx = createContext(
@@ -817,7 +817,7 @@ describe('UseSessions', () => {
 
               beforeEach(() => {
                 hook = getHookFunction(UseSessions({
-                  cookie: true,
+                  location: 'token-in-cookie',
                   store: Store,
                   user: fetchUser,
                   userCookie: () => '',
@@ -913,7 +913,7 @@ describe('UseSessions', () => {
       () => {
 
         beforeEach(() => {
-          hook = getHookFunction(UseSessions({ store: Store, cookie: true }));
+          hook = getHookFunction(UseSessions({ store: Store, location: 'token-in-cookie' }));
           ctx = createContext(
             {},
             {
@@ -1001,7 +1001,7 @@ describe('UseSessions', () => {
           }
         );
 
-        context('given options.cookie is false or not defined', () => {
+        context('given options.location equals "token-in-header" or is not defined', () => {
 
           it(
             'should not remove a session cookie in the response (it can belongs to another application).',
@@ -1029,10 +1029,10 @@ describe('UseSessions', () => {
 
         });
 
-        context('given options.cookie is true', () => {
+        context('given options.location equals "token-in-cookie"', () => {
 
           beforeEach(() => {
-            hook = getHookFunction(UseSessions({ store: Store, cookie: true }));
+            hook = getHookFunction(UseSessions({ store: Store, location: 'token-in-cookie' }));
             const token = ctx.request.get('Authorization');
             if (token) {
               ctx = createContext(
@@ -1071,7 +1071,7 @@ describe('UseSessions', () => {
           context('given userCookie is defined', () => {
 
             beforeEach(() => {
-              hook = getHookFunction(UseSessions({ store: Store, cookie: true, userCookie: () => '' }));
+              hook = getHookFunction(UseSessions({ store: Store, location: 'token-in-cookie', userCookie: () => '' }));
             });
 
             it('should remove the "user" cookie', async () => {
@@ -1148,7 +1148,7 @@ describe('UseSessions', () => {
           strictEqual(services.get(Store).updateCalledWith?.state.id, ctx.session.getToken());
         });
 
-        context('given options.cookie is false or not defined', () => {
+        context('given options.location equals "token-in-header" or is not defined', () => {
 
           it('should not set a cookie in the response.', async () => {
             const postHookFunction = await hook(ctx, services);
@@ -1171,10 +1171,10 @@ describe('UseSessions', () => {
 
         });
 
-        context('given options.cookie is true', () => {
+        context('given options.location equals "token-in-cookie"', () => {
 
           beforeEach(() => {
-            hook = getHookFunction(UseSessions({ store: Store, cookie: true }));
+            hook = getHookFunction(UseSessions({ store: Store, location: 'token-in-cookie' }));
             const token = ctx.request.get('Authorization');
             if (token) {
               ctx = createContext(
@@ -1215,7 +1215,7 @@ describe('UseSessions', () => {
 
             beforeEach(() => {
               hook = getHookFunction(UseSessions({
-                cookie: true,
+                location: 'token-in-cookie',
                 store: Store,
                 userCookie: (ctx, services) => {
                   userCookieParameters = { ctx, services };
@@ -1296,7 +1296,7 @@ describe('UseSessions', () => {
     });
 
     it('with the proper security scheme (cookie).', () => {
-      @UseSessions({ cookie: true })
+      @UseSessions({ location: 'token-in-cookie' })
       class Foobar {}
 
       const actualComponents = getApiComponents(Foobar, new Foobar());
@@ -1315,7 +1315,7 @@ describe('UseSessions', () => {
     it('with the proper security scheme (cookie) (cookie name different).', () => {
       Config.set('settings.session.cookie.name', 'auth2');
 
-      @UseSessions({ cookie: true })
+      @UseSessions({ location: 'token-in-cookie' })
       class Foobar {}
 
       const actualComponents = getApiComponents(Foobar, new Foobar());
@@ -1350,7 +1350,7 @@ describe('UseSessions', () => {
     context('given options.required is true', () => {
 
       it('with the proper security requirement (cookie).', () => {
-        @UseSessions({ cookie: true, required: true })
+        @UseSessions({ location: 'token-in-cookie', required: true })
         class Foobar {}
 
         const actualSecurityRequirements = getApiSecurity(Foobar);
@@ -1371,7 +1371,7 @@ describe('UseSessions', () => {
         deepStrictEqual(actualSecurityRequirements, expectedSecurityRequirements);
       });
 
-      function testResponses(options: { cookie: boolean }) {
+      function testResponses(options: { location: UseSessionOptions['location'] }) {
         @UseSessions({ ...options, required: true })
         class Foobar {}
 
@@ -1381,23 +1381,23 @@ describe('UseSessions', () => {
       }
 
       it('with the proper API responses (no cookie & no csrf protection).', () => {
-        testResponses({ cookie: false });
+        testResponses({ location: 'token-in-header' });
       });
 
       it('with the proper API responses (no cookie & csrf protection).', () => {
         Config.set('settings.session.csrf.enabled', true);
 
-        testResponses({ cookie: false });
+        testResponses({ location: 'token-in-header' });
       });
 
       it('with the proper API responses (cookie & no csrf protection).', () => {
-        testResponses({ cookie: true });
+        testResponses({ location: 'token-in-cookie' });
       });
 
       it('with the proper API responses (cookie & csrf protection).', () => {
         Config.set('settings.session.csrf.enabled', true);
 
-        @UseSessions({ cookie: true, required: true })
+        @UseSessions({ location: 'token-in-cookie', required: true })
         class Foobar {}
 
         deepStrictEqual(getApiResponses(Foobar), {
@@ -1411,7 +1411,7 @@ describe('UseSessions', () => {
     context('given options.required is false or undefined', () => {
 
       it('with no security requirement (cookie).', () => {
-        @UseSessions({ cookie: true })
+        @UseSessions({ location: 'token-in-cookie' })
         class Foobar {}
 
         const actualSecurityRequirements = getApiSecurity(Foobar);
@@ -1426,7 +1426,7 @@ describe('UseSessions', () => {
         strictEqual(actualSecurityRequirements, undefined);
       });
 
-      function testResponses(options: { cookie: boolean }) {
+      function testResponses(options: { location: UseSessionOptions['location'] }) {
         @UseSessions(options)
         class Foobar {}
 
@@ -1436,23 +1436,23 @@ describe('UseSessions', () => {
       }
 
       it('with the proper API responses (no cookie & no csrf protection).', () => {
-        testResponses({ cookie: false });
+        testResponses({ location: 'token-in-header' });
       });
 
       it('with the proper API responses (no cookie & csrf protection).', () => {
         Config.set('settings.session.csrf.enabled', true);
 
-        testResponses({ cookie: false });
+        testResponses({ location: 'token-in-header' });
       });
 
       it('with the proper API responses (cookie & no csrf protection).', () => {
-        testResponses({ cookie: true });
+        testResponses({ location: 'token-in-cookie' });
       });
 
       it('with the proper API responses (cookie & csrf protection).', () => {
         Config.set('settings.session.csrf.enabled', true);
 
-        @UseSessions({ cookie: true })
+        @UseSessions({ location: 'token-in-cookie' })
         class Foobar {}
 
         deepStrictEqual(getApiResponses(Foobar), {

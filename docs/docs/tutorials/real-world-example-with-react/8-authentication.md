@@ -26,7 +26,7 @@ import { StoriesController } from './api';
   url: '/api'
 })
 @UseSessions({
-  cookie: true,
+  location: 'token-in-cookie',
   user: fetchUser(User),
 })
 export class ApiController {

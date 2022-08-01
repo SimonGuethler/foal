@@ -117,7 +117,7 @@ import { User } from './entities';
 import { ApiController, AuthController } from './controllers';
 
 @UseSessions({
-  cookie: true,
+  location: 'token-in-cookie',
   user: fetchUser(User)
 })
 export class AppController implements IAppController {
@@ -706,7 +706,7 @@ import { ApiController, AuthController } from './controllers';
 import { User } from './entities';
 
 @UseSessions({
-  cookie: true,
+  location: 'token-in-cookie',
   user: fetchUser(User)
 })
 export class AppController implements IAppController {
