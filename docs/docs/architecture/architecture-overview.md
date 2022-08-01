@@ -56,12 +56,12 @@ Hooks are small functions that add extra logic before or after the execution of 
 
 ```typescript
 import { Get, HttpResponseOK } from '@foal/core';
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
 class AppController {
 
   @Get('/')
-  @JWTRequired()
+  @VerifyAndDecodeJWT()
   index() {
     return new HttpResponseOK('Hello world!');
   }
@@ -77,9 +77,9 @@ Here's an example of what a FoalTS application may look like.
 
 ```typescript
 import { Context, controller, Get, HttpResponseNotFound, HttpResponseOK, Log } from '@foal/core';
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
-@JWTRequired()
+@VerifyAndDecodeJWT()
 class ApiController {
   private products = [
     { id: 1, name: 'phone' },

@@ -1,5 +1,5 @@
 import { controller, createApp, Get, HttpResponseOK } from '@foal/core';
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
 class AppController {
   subControllers = [
@@ -9,7 +9,7 @@ class AppController {
 
 class ApiController {
   @Get('/users')
-  @JWTRequired()
+  @VerifyAndDecodeJWT()
   index() {
     return new HttpResponseOK([ { name: 'someone' } ]);
   }

@@ -22,7 +22,7 @@ import {
   ValidateBody,
   verifyPassword
 } from '@foal/core';
-import { getSecretOrPrivateKey, JWTRequired } from '@foal/jwt';
+import { getSecretOrPrivateKey, VerifyAndDecodeJWT } from '@foal/jwt';
 import { createAndInitializeDataSource } from '../../../common';
 
 describe('Feature: Authenticating users in a stateless SPA using the `Authorization` header', () => {
@@ -102,7 +102,7 @@ describe('Feature: Authenticating users in a stateless SPA using the `Authorizat
     }
   }
 
-  @JWTRequired({
+  @VerifyAndDecodeJWT({
     // Add the line below if you prefer ctx.user
     // to be an instance of User instead of the JWT payload.
     // user: fetchUser(User)

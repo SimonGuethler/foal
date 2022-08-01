@@ -114,12 +114,12 @@ export class User extends BaseEntity {
 
 *Example with JSON Web Tokens*:
 ```typescript
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 import { fetchMongoDBUser } from '@foal/typeorm';
 
 import { User } from '../entities';
 
-@JWTRequired({ user: fetchMongoDBUser(User) })
+@VerifyAndDecodeJWT({ user: fetchMongoDBUser(User) })
 class MyController {}
 ```
 

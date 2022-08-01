@@ -13,7 +13,7 @@ import {
   HttpResponseOK,
   // Log,
 } from '@foal/core';
-import { getSecretOrPrivateKey, JWTRequired } from '@foal/jwt';
+import { getSecretOrPrivateKey, VerifyAndDecodeJWT } from '@foal/jwt';
 
 describe('Feature: Setting up a simple application', () => {
 
@@ -31,7 +31,7 @@ describe('Feature: Setting up a simple application', () => {
 
     /* ======================= DOCUMENTATION BEGIN ======================= */
 
-    @JWTRequired()
+    @VerifyAndDecodeJWT()
     class ApiController {
       private products = [
         { id: 1, name: 'phone' },

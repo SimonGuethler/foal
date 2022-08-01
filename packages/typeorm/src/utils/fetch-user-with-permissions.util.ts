@@ -13,8 +13,7 @@ import { UserWithPermissions } from '../entities';
  *
  * This function is usually used by:
  * - UseSessions (@foal/core)
- * - JWTRequired (@foal/jwt)
- * - JWTOptional (@foal/jwt)
+ * - VerifyAndDecodeJWT (@foal/jwt)
  *
  * @export
  * @param {(Class<UserWithPermissions> & typeof BaseEntity)} userEntityClass - The entity class which must extend UserWithPermissions.

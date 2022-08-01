@@ -3,7 +3,7 @@ import { strictEqual } from 'assert';
 
 // FoalTS
 import { Context, createController, Get, HttpResponseOK, isHttpResponseOK } from '@foal/core';
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
 describe('Feature: Testing controllers', () => {
 
@@ -13,7 +13,7 @@ describe('Feature: Testing controllers', () => {
 
     class ApiController {
       @Get('/users/me')
-      @JWTRequired()
+      @VerifyAndDecodeJWT()
       getCurrentUser(ctx: Context) {
         return new HttpResponseOK(ctx.user);
       }

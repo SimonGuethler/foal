@@ -44,7 +44,7 @@ class InvalidRequestResponse extends HttpResponseBadRequest {
 }
 
 /**
- * Options of the hooks created by JWTRequired and JWTOptional.
+ * Options of the hooks created by VerifyAndDecodeJWT.
  *
  * @export
  * @interface JWTOptions
@@ -55,6 +55,7 @@ export interface JWTOptions {
   blackList?: (token: string) => boolean|Promise<boolean>;
   cookie?: boolean;
   csrf?: boolean;
+  required?: boolean;
   /**
    * Add openapi metadata to the class or class method.
    *
@@ -79,7 +80,7 @@ export interface VerifyOptions {
 }
 
 /**
- * Sub-function used by JWTRequired and JWTOptional to avoid code duplication.
+ * Sub-function used by VerifyAndDecodeJWT to avoid code duplication.
  *
  * @export
  * @param {boolean} required
@@ -87,7 +88,10 @@ export interface VerifyOptions {
  * @param {VerifyOptions} verifyOptions
  * @returns {HookDecorator}
  */
-export function JWT(required: boolean, options: JWTOptions, verifyOptions: VerifyOptions): HookDecorator {
+export function VerifyAndDecodeJWT(options: JWTOptions = {}, verifyOptions: VerifyOptions = {}): HookDecorator {
+  // TODO: test the "?? true"
+  const required = options.required ?? true;
+
   async function hook(ctx: Context, services: ServiceManager) {
     let token: string|undefined;
 

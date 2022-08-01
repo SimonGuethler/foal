@@ -13,7 +13,7 @@ import {
   Post,
   ValidateBody,
 } from '@foal/core';
-import { getSecretOrPrivateKey, JWTRequired } from '@foal/jwt';
+import { getSecretOrPrivateKey, VerifyAndDecodeJWT } from '@foal/jwt';
 
 describe('Feature: Using a hook', () => {
 
@@ -31,7 +31,7 @@ describe('Feature: Using a hook', () => {
 
     /* ======================= DOCUMENTATION BEGIN ======================= */
 
-    @JWTRequired()
+    @VerifyAndDecodeJWT()
     class AppController {
       private products = [
         { name: 'Hoover' }

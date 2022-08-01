@@ -9,7 +9,7 @@ import { parse } from 'yamljs';
 
 // FoalTS
 import { ApiDefineSchema, ApiInfo, createApp, createOpenApiDocument, Get, Post, ValidateBody } from '@foal/core';
-import { JWTOptional, JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
 describe('Foal', () => {
 
@@ -19,7 +19,7 @@ describe('Foal', () => {
       title: 'My API',
       version: '1.0.0'
     })
-    @JWTRequired()
+    @VerifyAndDecodeJWT({ required: true })
     class ApiController {
       @Post('/products')
       @ValidateBody({
@@ -46,11 +46,11 @@ describe('Foal', () => {
     })
     class ApiController2 {
       @Get('/products')
-      @JWTOptional()
+      @VerifyAndDecodeJWT({ required: false })
       readProducts() {}
 
       @Post('/products')
-      @JWTRequired()
+      @VerifyAndDecodeJWT({ required: true })
       @ValidateBody({
         properties: {
           name: { type: 'string' }

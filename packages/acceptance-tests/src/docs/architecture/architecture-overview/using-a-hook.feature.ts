@@ -4,7 +4,7 @@ import * as request from 'supertest';
 
 // FoalTS
 import { Config, createApp, Get, HttpResponseOK } from '@foal/core';
-import { getSecretOrPrivateKey, JWTRequired } from '@foal/jwt';
+import { getSecretOrPrivateKey, VerifyAndDecodeJWT } from '@foal/jwt';
 
 describe('Feature: Using a hook', () => {
 
@@ -25,7 +25,7 @@ describe('Feature: Using a hook', () => {
     class AppController {
 
       @Get('/')
-      @JWTRequired()
+      @VerifyAndDecodeJWT()
       index() {
         return new HttpResponseOK('Hello world!');
       }

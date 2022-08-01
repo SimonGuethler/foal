@@ -19,7 +19,7 @@ import {
   ValidateBody,
   verifyPassword
 } from '@foal/core';
-import { getSecretOrPrivateKey, JWTRequired, setAuthCookie } from '@foal/jwt';
+import { getSecretOrPrivateKey, VerifyAndDecodeJWT, setAuthCookie } from '@foal/jwt';
 import { createFixtureUser, createAndInitializeDataSource, credentialsSchema, readCookie, User } from '../../../common';
 
 describe('Feature: Stateless CSRF protection in a Single-Page Application', () => {
@@ -63,7 +63,7 @@ describe('Feature: Stateless CSRF protection in a Single-Page Application', () =
   }
 
   // api.controller.ts
-  @JWTRequired({
+  @VerifyAndDecodeJWT({
     cookie: true,
   })
   class ApiController {

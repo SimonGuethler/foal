@@ -295,10 +295,10 @@ If you want the `hasPerm` method to work on the context `user` property, you mus
 *Example with JSON Web Tokens*
 ```typescript
 import { Context, Get } from '@foal/core';
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 import { fetchUserWithPermissions } from '@foal/typeorm';
 
-@JWTRequired({
+@VerifyAndDecodeJWT({
   user: fetchUserWithPermissions(User)
 })
 export class ProductController {
@@ -359,9 +359,9 @@ export class ProductController {
 ```typescript
 import { Context, Get } from '@foal/core';
 import { fetchUserWithPermissions, PermissionRequired } from '@foal/typeorm';
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
-@JWTRequired({ user: fetchUserWithPermissions(User) })
+@VerifyAndDecodeJWT({ user: fetchUserWithPermissions(User) })
 export class ProductController {
   @Get('/products')
   @PermissionRequired('read-products')

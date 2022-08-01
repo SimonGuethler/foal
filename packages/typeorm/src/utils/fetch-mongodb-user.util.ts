@@ -11,8 +11,7 @@ import { ObjectId } from 'mongodb';
  *
  * This function is usually used by:
  * - UseSessions (@foal/core)
- * - JWTRequired (@foal/jwt)
- * - JWTOptional (@foal/jwt)
+ * - VerifyAndDecodeJWT (@foal/jwt)
  *
  * @export
  * @param {(Class<{ id: ObjectID }|{ _id: ObjectID }> & typeof BaseEntity)} userEntityClass - The entity class.

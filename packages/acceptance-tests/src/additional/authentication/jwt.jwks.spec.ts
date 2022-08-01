@@ -11,7 +11,7 @@ import * as superagent from 'superagent';
 // FoalTS
 import { createApp, Get, HttpResponseOK } from '@foal/core';
 import { getRSAPublicKeyFromJWKS } from '@foal/jwks-rsa';
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
 describe('[Authentication|JWT|JWKS] Users can be authenticated with a JWKS retreived', () => {
 
@@ -53,7 +53,7 @@ describe('[Authentication|JWT|JWKS] Users can be authenticated with a JWKS retre
       }
 
       @Get('/api/users/me')
-      @JWTRequired({
+      @VerifyAndDecodeJWT({
         secretOrPublicKey: getRSAPublicKeyFromJWKS({
           jwksUri: 'http://localhost:3000/.well-known/jwks.json'
         })

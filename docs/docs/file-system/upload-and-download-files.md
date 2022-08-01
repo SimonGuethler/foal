@@ -311,7 +311,7 @@ import { Disk, ValidateMultipartFormDataBody } from '@foal/storage';
 
 import { User } from './entities';
 
-// @JWTRequired OR @UseSessions
+// @VerifyAndDecodeJWT OR @UseSessions
 // OR a custom hook that sets Context.user.
 export class AppController {
 

@@ -389,11 +389,11 @@ A controller is a simple class and so can be tested as is. Note that [hooks](./h
 *api.controller.ts (example)*
 ```typescript
 import { Context, Get, HttpResponseOK } from '@foal/core';
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
 class ApiController {
   @Get('/users/me')
-  @JWTRequired()
+  @VerifyAndDecodeJWT()
   getCurrentUser(ctx: Context) {
     return new HttpResponseOK(ctx.user);
   }

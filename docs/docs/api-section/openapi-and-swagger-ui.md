@@ -34,7 +34,7 @@ export class AppController {
 *api.controller.ts*
 ```typescript
 import { ApiInfo, ApiServer, Context, Post, ValidateBody } from '@foal/core';
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
 @ApiInfo({
   title: 'A Great API',
@@ -43,7 +43,7 @@ import { JWTRequired } from '@foal/jwt';
 @ApiServer({
   url: '/api'
 })
-@JWTRequired()
+@VerifyAndDecodeJWT()
 export class ApiController {
 
   @Post('/products')
@@ -253,7 +253,7 @@ paths:
 The addition of these decorators can be quite redundant with existing hooks. For example, if we want to write OpenAPI documentation for authentication and validation of the request body, we may end up with something like this.
 
 ```typescript
-@JWTRequired()
+@VerifyAndDecodeJWT()
 @ApiSecurityRequirement({ bearerAuth: [] })
 @ApiDefineSecurityScheme('bearerAuth', {
   type: 'http',
@@ -280,7 +280,7 @@ export class ApiController {
 To avoid this, the framework hooks already expose an API specification which is directly included in the generated OpenAPI document.
 
 ```typescript
-@JWTRequired()
+@VerifyAndDecodeJWT()
 export class ApiController {
   
   @Post('/products')

@@ -9,8 +9,7 @@ import { BaseEntity } from 'typeorm';
  *
  * This function is usually used by:
  * - UseSessions (@foal/core)
- * - JWTRequired (@foal/jwt)
- * - JWTOptional (@foal/jwt)
+ * - VerifyAndDecodeJWT (@foal/jwt)
  *
  * @export
  * @param {(Class<{ id: number|string }> & typeof BaseEntity)} userEntityClass - The entity class.

@@ -21,7 +21,7 @@ import {
   ValidateBody,
   verifyPassword
 } from '@foal/core';
-import { getSecretOrPrivateKey, JWTRequired, removeAuthCookie, setAuthCookie } from '@foal/jwt';
+import { getSecretOrPrivateKey, VerifyAndDecodeJWT, removeAuthCookie, setAuthCookie } from '@foal/jwt';
 import { createAndInitializeDataSource, readCookie, writeCookie } from '../../../common';
 
 describe('Feature: Authenticating users in a stateless SPA using cookies', () => {
@@ -110,7 +110,7 @@ describe('Feature: Authenticating users in a stateless SPA using cookies', () =>
     }
   }
 
-  @JWTRequired({
+  @VerifyAndDecodeJWT({
     cookie: true,
     // Add the line below if you prefer ctx.user
     // to be an instance of User instead of the JWT payload.

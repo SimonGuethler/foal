@@ -24,23 +24,23 @@ Foal provides a number of hooks to handle the most common scenarios.
 
 - `ValidateBody`, `ValidateHeader`, `ValidatePathParam`, `ValidateCookie` and `ValidateQueryParam` validate the format of the incoming HTTP requests (see [Validation](../common/validation-and-sanitization.md)).
 - `Log` displays information on the request (see [Logging & Debugging](../common/logging-and-debugging.md)).
-- `JWTRequired`, `JWTOptional`, `UseSessions` authenticate the user by filling the `ctx.user` property.
+- `VerifyAndDecodeJWT`, `UseSessions` authenticate the user by filling the `ctx.user` property.
 - `PermissionRequired` restricts the route access to certain users.
 
 ## Use
 
 A hook can decorate a controller method or the controller itself. If it decorates the controller then it applies to all its methods and sub-controllers.
 
-In the below example, `JWTRequired` applies to `listProducts` and `addProduct`.
+In the below example, `VerifyAndDecodeJWT` applies to `listProducts` and `addProduct`.
 
 *Example:*
 ```typescript
 import {
   Context, Get, HttpResponseCreated, HttpResponseOK, Post, ValidateBody
 } from '@foal/core';
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
-@JWTRequired()
+@VerifyAndDecodeJWT()
 class AppController {
   private products = [
     { name: 'Hoover' }

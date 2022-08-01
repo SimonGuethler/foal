@@ -15,11 +15,8 @@ export {
   isInvalidTokenError,
 } from './invalid-token.error';
 export {
-  JWTOptional,
-} from './jwt-optional.hook';
-export {
-  JWTRequired,
-} from './jwt-required.hook';
+  VerifyAndDecodeJWT,
+} from './jwt.hook';
 export {
   JWTOptions, VerifyOptions,
 } from './jwt.hook';

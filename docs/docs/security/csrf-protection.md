@@ -297,9 +297,9 @@ export class AuthController {
 *api.controller.ts*
 ```typescript
 import { HttpResponseCreated } from '@foal/core';
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
-@JWTRequired({
+@VerifyAndDecodeJWT({
   cookie: true,
 })
 export class ApiController {

@@ -27,7 +27,7 @@ To do so, you will have to remove TypeORM and all its utilities and implement so
 
 ### The `fetchUser` function
 
-If you wish to use the `user` option of `@JWTRequired` or `@UseSessions` to set the `ctx.user` property, then you will need to implement your own `fetchUser` function.
+If you wish to use the `user` option of `@VerifyAndDecodeJWT` or `@UseSessions` to set the `ctx.user` property, then you will need to implement your own `fetchUser` function.
 
 This utility returns a function that takes an `id` as parameter which might be a `string` or a `number` and returns a promise. The promise value must be `null` is no user matches the given `id` and the *user object* otherwise.
 
@@ -170,7 +170,7 @@ export class AppController implements IAppController {
 
 #### The `fetchUser` function
 
-In case your application uses the hooks `@UseSessions` or `@JWTRequired` and you want to assign a value to `ctx.user`, then you will need to create a `fetchUser` function.
+In case your application uses the hooks `@UseSessions` or `@VerifyAndDecodeJWT` and you want to assign a value to `ctx.user`, then you will need to create a `fetchUser` function.
 
 First, make sure your have a `User` model defined in `schema.prisma`.
 
@@ -215,7 +215,7 @@ export async function fetchPrismaUser(id: number|string, services: ServiceManage
 
 You're now ready to use it in your hooks.
 ```typescript
-@JWTRequired({ user: fetchPrismaUser })
+@VerifyAndDecodeJWT({ user: fetchPrismaUser })
 // OR
 @UseSessions({ user: fetchPrismaUser })
 ```

@@ -183,7 +183,7 @@ export class User extends BaseEntity {
 
 ## Receive & Verify Tokens
 
-Foal provides two hooks to authenticate users upon subsequent requests: `JWTOptional` and `JWTRequired`. They both expect the client to send the JWT in the **Authorization** header using the **Bearer** schema. 
+Foal provides a hooks to authenticate users upon subsequent requests: `VerifyAndDecodeJWT`. It expects the client to send the JWT in the **Authorization** header using the **Bearer** schema. 
 
 In other words, the content of the header should look like the following:
 
@@ -191,16 +191,16 @@ In other words, the content of the header should look like the following:
 Authorization: Bearer <token>
 ```
 
-If no token is provided, the `JWTRequired` hook returns an error *400 - BAD REQUEST* while `JWTOptional` does nothing.
+If no token is provided, the `VerifyAndDecodeJWT` hook returns an error *400 - BAD REQUEST* or does nothing depending on the `required` option. Default behavior is to return an error.
 
 If a token is provided and valid, the hooks set the `Context.user` with the decoded payload (default behavior).
 
 *Example*
 ```typescript
 import { Context, Get, HttpResponseOK } from '@foal/core';
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
-@JWTRequired()
+@VerifyAndDecodeJWT()
 export class ApiController {
 
   @Get('/products')
@@ -220,9 +220,9 @@ In the event that a jwt has been stolen by an attacker, the application must be 
 
 ```typescript
 import { isInFile } from '@foal/core';
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
-@JWTRequired({ blackList: isInFile('./blacklist.txt') })
+@VerifyAndDecodeJWT({ blackList: isInFile('./blacklist.txt') })
 export class ApiController {
   // ...
 }
@@ -287,7 +287,7 @@ export function RefreshJWT(): HookDecorator {
 
 *api.controller.ts (example)*
 ```typescript
-@JWTRequired()
+@VerifyAndDecodeJWT()
 @RefreshJWT()
 export class ApiController {
   // ...
@@ -298,7 +298,7 @@ export class ApiController {
 
 In several cases, the decoded payload is not sufficient. We may need to fetch extra properties from the database, such as the user permissions for example, or simply want the `Context.user` to a be a model instance instead of a plain object.
 
-In these cases, the two hooks `JWTRequired` and `JWTOptional` offer a `user` option to transform the decoded payload into something else. To do this,
+In these cases, the hooks `VerifyAndDecodeJWT` offers a `user` option to transform the decoded payload into something else. To do this,
 
 - Each JSON Web Token must have a `subject` property (or `sub`) which is a string containing the user id. If the id is a number, it must be converted to a string using, for example, the `toString()` method.
   ```typescript
@@ -323,13 +323,13 @@ In these cases, the two hooks `JWTRequired` and `JWTOptional` offer a `user` opt
   *Example with TypeORM (SQL database)*
   ```typescript
   import { Context, Get } from '@foal/core';
-  import { JWTRequired } from '@foal/jwt';
+  import { VerifyAndDecodeJWT } from '@foal/jwt';
   import { fetchUser } from '@foal/typeorm';
 
   import { User } from '../entities';
 
   // fetchUser fetches the user from the database using the entity User. It returns an instance of User.
-  @JWTRequired({ user: fetchUser(User) })
+  @VerifyAndDecodeJWT({ user: fetchUser(User) })
   export class ApiController {
     @Get('/do-something')
     get(ctx: Context) {
@@ -342,13 +342,13 @@ In these cases, the two hooks `JWTRequired` and `JWTOptional` offer a `user` opt
   *Example with TypeORM (MongoDB)*
   ```typescript
   import { Context, Get } from '@foal/core';
-  import { JWTRequired } from '@foal/jwt';
+  import { VerifyAndDecodeJWT } from '@foal/jwt';
   import { fetchMongoDBUser } from '@foal/typeorm';
 
   import { User } from '../entities';
 
   // fetchMongoDBUser fetches the user from the database using the entity User. It returns an instance of User.
-  @JWTRequired({ user: fetchMongoDBUser(User) })
+  @VerifyAndDecodeJWT({ user: fetchMongoDBUser(User) })
   export class ApiController {
     @Get('/do-something')
     get(ctx: Context) {
@@ -362,7 +362,7 @@ In these cases, the two hooks `JWTRequired` and `JWTOptional` offer a `user` opt
 
   ```typescript
   import { Context, Get } from '@foal/core';
-  import { JWTRequired } from '@foal/jwt';
+  import { VerifyAndDecodeJWT } from '@foal/jwt';
 
   const users = [
     { id: 1, email: 'mary@foalts.org', isAdmin: true },
@@ -373,7 +373,7 @@ In these cases, the two hooks `JWTRequired` and `JWTOptional` offer a `user` opt
     return users.find(user => user.id.toString() === id);
   }
 
-  @JWTRequired({ user: getUserById })
+  @VerifyAndDecodeJWT({ user: getUserById })
   export class ApiController {
     @Get('/do-something')
     get(ctx: Context) {
@@ -445,9 +445,9 @@ By default, the hooks expect the token to be sent in the **Authorization** heade
 
 *api.controller.ts*
 ```typescript
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
-@JWTRequired({ cookie: true })
+@VerifyAndDecodeJWT({ cookie: true })
 export class ApiController {
   // ...
 }
@@ -594,9 +594,9 @@ const token = sign(
 
 *Example with RSA*
 ```typescript
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
-@JWTRequired({}, { algorithm: 'RS256' })
+@VerifyAndDecodeJWT({}, { algorithm: 'RS256' })
 export class ApiController {
   // ...
 }
@@ -605,13 +605,13 @@ export class ApiController {
 
 ### Audience, Issuer and Other Options
 
-The second parameter of `JWTOptional` and `JWTRequired` allows to specify the required audience or issuer as well as other properties. It is passed as options to the `verify` function of the [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken) library.
+The second parameter of `VerifyAndDecodeJWT` allows to specify the required audience or issuer as well as other properties. It is passed as options to the `verify` function of the [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken) library.
 
 *Example checking the audience*
 ```typescript
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
-@JWTRequired({}, { audience: [ /urn:f[o]{2}/, 'urn:bar' ] })
+@VerifyAndDecodeJWT({}, { audience: [ /urn:f[o]{2}/, 'urn:bar' ] })
 export class ApiController {
   // ...
 }
@@ -620,9 +620,9 @@ export class ApiController {
 
 *Example checking the issuer*
 ```typescript
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
-@JWTRequired({}, { issuer: 'foo' })
+@VerifyAndDecodeJWT({}, { issuer: 'foo' })
 export class ApiController {
   // ...
 }
@@ -631,7 +631,7 @@ export class ApiController {
 
 ### Retreive a Dynamic Secret Or Public Key
 
-By default `JWTRequired` and `JWTOptional` use the value of the configuration keys `settings.jwt.secret` or `settings.jwt.publicKey` as a static secret (or public key).
+By default `VerifyAndDecodeJWT` uses the value of the configuration keys `settings.jwt.secret` or `settings.jwt.publicKey` as a static secret (or public key).
 
 But it is also possible to dynamically retrieve a key to verify the token. To do so, you can specify a function with the below signature to the `secretOrPublicKey` option.
 
@@ -641,9 +641,9 @@ But it is also possible to dynamically retrieve a key to verify the token. To do
 
 *Example*
 ```typescript
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
-@JWTRequired({
+@VerifyAndDecodeJWT({
   secretOrPublicKey: async (header, payload) => {
     // ...
     return 'my-secret';
@@ -658,9 +658,9 @@ If needed, this function can throw an `InvalidTokenError` to return a 401 error 
 
 *Example*
 ```typescript
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
-@JWTRequired({
+@VerifyAndDecodeJWT({
   secretOrPublicKey: async (header, payload) => {
     if (header.alg !== 'RS256') {
       throw new InvalidTokenError('invalid algorithm');
@@ -692,9 +692,9 @@ The `getRSAPublicKeyFromJWKS` allows you to retreive a public key from a JWKS en
 
 *Example*
 ```typescript
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
-@JWTRequired({
+@VerifyAndDecodeJWT({
   secretOrPublicKey: getRSAPublicKeyFromJWKS({
     cache: true,
     cacheMaxEntries: 5, // Default value
@@ -721,7 +721,7 @@ This section provides examples on how to decode and verify JWTs generated by the
 
 *Auth0*
 ```typescript
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
 // These lines assume that you provided your DOMAIN and AUDIENCE in either
 // an .env file, in environment variables or in one the configuration file 
@@ -729,7 +729,7 @@ import { JWTRequired } from '@foal/jwt';
 const domain = Config.getOrThrow('auth0.domain', 'string');
 const audience = Config.getOrThrow('auth0.audience', 'string');
 
-@JWTRequired({
+@VerifyAndDecodeJWT({
   secretOrPublicKey: getRSAPublicKeyFromJWKS({
     cache: true,
     jwksRequestsPerMinute: 5,
@@ -749,7 +749,7 @@ export class ApiController {
 
 *AWS Cognito*
 ```typescript
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
 // These lines assume that you provided your CLIENT_ID, DOMAIN and USER_POOL_ID
 // in either an .env file, in environment variables or in one the configuration 
@@ -758,7 +758,7 @@ const clientId = Config.getOrThrow('cognito.clientId', 'string');
 const domain = Config.getOrThrow('cognito.domain', 'string');
 const userPoolId = Config.getOrThrow('cognito.userPoolId', 'string');
 
-@JWTRequired({
+@VerifyAndDecodeJWT({
   secretOrPublicKey: getRSAPublicKeyFromJWKS({
     cache: true,
     jwksRequestsPerMinute: 5,
@@ -783,8 +783,8 @@ export class ApiController {
 | Error | Response Status | Response Body |  `WWW-Authenticate` Response Header
 | --- | --- | --- | --- |
 | No secret or public key is provided in `default.json` or as environment variable. | 500 | | |
-| The `Authorization` header does not exist (only for `JWTRequired`). | 400 | `{ code: 'invalid_request', description: 'Authorization header not found.' }` |
-| The auth cookie does not exist (only for `JWTRequired`). | 400 | `{ code: 'invalid_request', description: 'Auth cookie not found.' }` |
+| The `Authorization` header does not exist (only when the `required` option is not false). | 400 | `{ code: 'invalid_request', description: 'Authorization header not found.' }` |
+| The auth cookie does not exist (only when the `required` option is not false). | 400 | `{ code: 'invalid_request', description: 'Auth cookie not found.' }` |
 | The `Authorization` header does use the Bearer scheme. | 400 | `{ code: 'invalid_request', description: 'Expected a bearer token. Scheme is Authorization: Bearer <token>.' }` |
 | The token is black listed. | 401 | `{ code: 'invalid_token', description: 'jwt revoked' }` | error="invalid_token", error_description="jwt revoked"
 | The token is not a JWT. | 401 | `{ code: 'invalid_token', description: 'jwt malformed' }` | error="invalid_token", error_description="jwt malformed"

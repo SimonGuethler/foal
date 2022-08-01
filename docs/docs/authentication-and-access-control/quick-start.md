@@ -54,7 +54,7 @@ FoalTS provides two ways to generate tokens:
 
 ### The Authentication Hooks (step 2)
 
-In step 2, the hook `@UseSessions` takes care of checking the session tokens and retrieve their associated user. The same applies to `JWTRequired` and `JWTOptional` with JSON Web Tokens.
+In step 2, the hook `@UseSessions` takes care of checking the session tokens and retrieve their associated user. The same applies to `VerifyAndDecodeJWT` with JSON Web Tokens.
 
 You will find more information in the documentation pages dedicated to them.
 
@@ -367,11 +367,11 @@ export class AuthController {
 *src/app/controllers/api.controller.ts*
 ```typescript
 import { Get, HttpResponseOK } from '@foal/core';
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
 import { User } from './entities';
 
-@JWTRequired({
+@VerifyAndDecodeJWT({
   cookie: true,
   // Add the line below if you prefer ctx.user
   // to be an instance of User instead of the JWT payload.
@@ -665,11 +665,11 @@ export class AuthController {
 *src/app/controllers/api.controller.ts*
 ```typescript
 import { Get, HttpResponseOK } from '@foal/core';
-import { JWTRequired } from '@foal/jwt';
+import { VerifyAndDecodeJWT } from '@foal/jwt';
 
 import { User } from '../entities';
 
-@JWTRequired({
+@VerifyAndDecodeJWT({
   // Add the line below if you prefer ctx.user
   // to be an instance of User instead of the JWT payload.
   // user: fetchUser(User)
