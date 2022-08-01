@@ -300,7 +300,7 @@ import { HttpResponseCreated } from '@foal/core';
 import { JWTRequired } from '@foal/jwt';
 
 @JWTRequired({
-  cookie: true,
+  location: 'token-in-cookie',
 })
 export class ApiController {
   @Post('/products')

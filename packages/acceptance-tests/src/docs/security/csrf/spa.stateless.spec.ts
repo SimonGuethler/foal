@@ -64,7 +64,7 @@ describe('Feature: Stateless CSRF protection in a Single-Page Application', () =
 
   // api.controller.ts
   @JWTRequired({
-    cookie: true,
+    location: 'token-in-cookie',
   })
   class ApiController {
     @Post('/products')

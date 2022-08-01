@@ -53,7 +53,7 @@ export interface JWTOptions {
   user?: FetchUser;
   secretOrPublicKey?: (header: any, payload: any) => Promise<string>;
   blackList?: (token: string) => boolean|Promise<boolean>;
-  cookie?: boolean;
+  location?: 'token-in-header' | 'token-in-cookie',
   csrf?: boolean;
   /**
    * Add openapi metadata to the class or class method.
@@ -92,7 +92,7 @@ export function JWT(required: boolean, options: JWTOptions, verifyOptions: Verif
     let token: string|undefined;
 
     try {
-      token = getJwtFromRequest(ctx.request, options.cookie ? 'token-in-cookie' : 'token-in-header', required);
+      token = getJwtFromRequest(ctx.request, options.location || 'token-in-header', required);
     } catch (error) {
       if (error instanceof RequestValidationError) {
         return new InvalidRequestResponse(error.message);
@@ -153,7 +153,7 @@ export function JWT(required: boolean, options: JWTOptions, verifyOptions: Verif
     /* Verify CSRF token */
 
     if (
-      options.cookie &&
+      options.location === 'token-in-cookie' &&
       (options.csrf ?? Config.get('settings.jwt.csrf.enabled', 'boolean', false)) &&
       ![ 'GET', 'HEAD', 'OPTIONS' ].includes(ctx.request.method)
     ) {
@@ -210,7 +210,7 @@ export function JWT(required: boolean, options: JWTOptions, verifyOptions: Verif
       ApiResponse(401, { description: 'JWT is invalid.' })
   ];
 
-  if (options.cookie) {
+  if (options.location === 'token-in-cookie') {
     const securityScheme: IApiSecurityScheme = {
       in: 'cookie',
       name: Config.get('settings.jwt.cookie.name', 'string', JWT_DEFAULT_COOKIE_NAME),

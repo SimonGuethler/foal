@@ -447,7 +447,7 @@ By default, the hooks expect the token to be sent in the **Authorization** heade
 ```typescript
 import { JWTRequired } from '@foal/jwt';
 
-@JWTRequired({ cookie: true })
+@JWTRequired({ location: 'token-in-cookie' })
 export class ApiController {
   // ...
 }

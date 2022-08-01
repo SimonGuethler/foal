@@ -30,6 +30,7 @@ import { JWT_DEFAULT_COOKIE_NAME, JWT_DEFAULT_CSRF_COOKIE_NAME } from './constan
 import { InvalidTokenError } from './invalid-token.error';
 import { JWTOptional } from './jwt-optional.hook';
 import { JWTRequired } from './jwt-required.hook';
+import { JWTOptions } from './jwt.hook';
 
 // See https://github.com/auth0/node-jsonwebtoken/tree/master/test
 const publicKey = `-----BEGIN RSA PUBLIC KEY-----
@@ -134,7 +135,7 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
 
   describe('should validate the request and', () => {
 
-    context('given options.cookie is false or not defined', () => {
+    context('given options.location equals "token-in-cookie" or is not defined', () => {
 
       if (required) {
 
@@ -176,12 +177,12 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
 
     });
 
-    context('given options.cookie is true', () => {
+    context('given options.cookie equals "token-in-header"', () => {
 
       if (required) {
 
         it('should return an HttpResponseBadRequest object if the cookie does not exist.' , async () => {
-          const hook = getHookFunction(JWT({ cookie: true }));
+          const hook = getHookFunction(JWT({ location: 'token-in-cookie' }));
 
           const response = await hook(ctx, services);
           if (!isHttpResponseBadRequest(response)) {
@@ -196,7 +197,7 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
       } else {
 
         it('should let ctx.user equal null if the cookie does not exist.', async () => {
-          const hook = getHookFunction(JWT({ cookie: true }));
+          const hook = getHookFunction(JWT({ location: 'token-in-cookie' }));
 
           const response = await hook(ctx, services);
           strictEqual(response, undefined);
@@ -499,7 +500,7 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
 
       afterEach(() => Config.remove('settings.jwt.csrf.enabled'));
 
-      context('given options.cookie is false or not defined', () => {
+      context('given options.location equals "token-in-cookie" or is not defined', () => {
 
         beforeEach(() => ctx = createContext({ Authorization: `Bearer ${token}` }));
 
@@ -512,11 +513,11 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
 
       });
 
-      context('given options.cookie is true', () => {
+      context('given options.cookie equals "token-in-header"', () => {
 
         context('given options.csrf is false', () => {
 
-          beforeEach(() => hook = getHookFunction(JWT({ cookie: true, csrf: false })));
+          beforeEach(() => hook = getHookFunction(JWT({ location: 'token-in-cookie', csrf: false })));
 
           it('should NOT return an HttpResponseForbidden instance if the request has no CSRF token.', async () => {
             ctx = createContext({}, { [JWT_DEFAULT_COOKIE_NAME]: token }, {}, 'POST');
@@ -530,7 +531,7 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
 
         context('given options.csrf is undefined', () => {
 
-          beforeEach(() => hook = getHookFunction(JWT({ cookie: true })));
+          beforeEach(() => hook = getHookFunction(JWT({ location: 'token-in-cookie' })));
 
           function testUnprotectedMethod(method: HttpMethod) {
             it('should not return an HttpResponseForbidden instance if the request has no CSRF token.', async () => {
@@ -807,7 +808,7 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
       });
 
       it('with the decoded payload (cookie & secret).', async () => {
-        const hook = getHookFunction(JWT({ cookie: true }));
+        const hook = getHookFunction(JWT({ location: 'token-in-cookie' }));
 
         const jwt = sign({ foo: 'bar' }, secret, {});
         ctx = createContext({}, { [JWT_DEFAULT_COOKIE_NAME]: jwt });
@@ -821,7 +822,7 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
       it('with the decoded payload (cookie with a custom name & secret).', async () => {
         Config.set('settings.jwt.cookie.name', 'xxx');
 
-        const hook = getHookFunction(JWT({ cookie: true }));
+        const hook = getHookFunction(JWT({ location: 'token-in-cookie' }));
 
         const jwt = sign({ foo: 'bar' }, secret, {});
         ctx = createContext({}, { xxx: jwt });
@@ -916,7 +917,7 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
     });
 
     it('with the proper security scheme (cookie).', () => {
-      @JWT({  cookie: true })
+      @JWT({  location: 'token-in-cookie' })
       class Foobar {}
 
       const actualComponents = getApiComponents(Foobar, new Foobar());
@@ -935,7 +936,7 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
     it('with the proper security scheme (cookie name different).', () => {
       Config.set('settings.jwt.cookie.name', 'auth2');
 
-      @JWT({ cookie: true })
+      @JWT({ location: 'token-in-cookie' })
       class Foobar {}
 
       const actualComponents = getApiComponents(Foobar, new Foobar());
@@ -971,7 +972,7 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
     if (required) {
 
       it('with the proper security requirement (cookie).', () => {
-        @JWT({ cookie: true })
+        @JWT({ location: 'token-in-cookie' })
         class Foobar {}
 
         const actualSecurityRequirements = getApiSecurity(Foobar);
@@ -992,7 +993,7 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
         deepStrictEqual(actualSecurityRequirements, expectedSecurityRequirements);
       });
 
-      function testResponses(options: { cookie: boolean }) {
+      function testResponses(options: { location: JWTOptions['location'] }) {
         @JWT(options)
         class Foobar {}
 
@@ -1002,23 +1003,23 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
       }
 
       it('with the proper API responses (no cookie & no csrf protection).', () => {
-        testResponses({ cookie: false });
+        testResponses({ location: 'token-in-header' });
       });
 
       it('with the proper API responses (no cookie & csrf protection).', () => {
         Config.set('settings.jwt.csrf.enabled', true);
 
-        testResponses({ cookie: false });
+        testResponses({ location: 'token-in-header' });
       });
 
       it('with the proper API responses (cookie & no csrf protection).', () => {
-        testResponses({ cookie: true });
+        testResponses({ location: 'token-in-cookie' });
       });
 
       it('with the proper API responses (cookie & csrf protection).', () => {
         Config.set('settings.jwt.csrf.enabled', true);
 
-        @JWT({ cookie: true })
+        @JWT({ location: 'token-in-cookie' })
         class Foobar {}
 
         deepStrictEqual(getApiResponses(Foobar), {
@@ -1030,7 +1031,7 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
     } else {
 
       it('with no security requirement (cookie).', () => {
-        @JWT({ cookie: true })
+        @JWT({ location: 'token-in-cookie' })
         class Foobar {}
 
         const actualSecurityRequirements = getApiSecurity(Foobar);
@@ -1045,7 +1046,7 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
         strictEqual(actualSecurityRequirements, undefined);
       });
 
-      function testResponses(options: { cookie: boolean }) {
+      function testResponses(options: { location: JWTOptions['location'] }) {
         @JWT(options)
         class Foobar {}
 
@@ -1055,23 +1056,23 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
       }
 
       it('with the proper API responses (no cookie & no csrf protection).', () => {
-        testResponses({ cookie: false });
+        testResponses({ location: 'token-in-header' });
       });
 
       it('with the proper API responses (no cookie & csrf protection).', () => {
         Config.set('settings.jwt.csrf.enabled', true);
 
-        testResponses({ cookie: false });
+        testResponses({ location: 'token-in-header' });
       });
 
       it('with the proper API responses (cookie & no csrf protection).', () => {
-        testResponses({ cookie: true });
+        testResponses({ location: 'token-in-cookie' });
       });
 
       it('with the proper API responses (cookie & csrf protection).', () => {
         Config.set('settings.jwt.csrf.enabled', true);
 
-        @JWT({ cookie: true })
+        @JWT({ location: 'token-in-cookie' })
         class Foobar {}
 
         deepStrictEqual(getApiResponses(Foobar), {
@@ -1082,7 +1083,7 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
 
     }
 
-    function testParameters(options: { cookie: boolean }) {
+    function testParameters(options: { location: JWTOptions['location'] }) {
       @JWT(options)
       class Foobar {}
 
@@ -1090,23 +1091,23 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
     }
 
     it('with the proper API parameters (no cookie & no csrf protection).', () => {
-      testParameters({ cookie: false });
+      testParameters({ location: 'token-in-header' });
     });
 
     it('with the proper API parameters (no cookie & csrf protection).', () => {
       Config.set('settings.jwt.csrf.enabled', true);
 
-      testParameters({ cookie: false });
+      testParameters({ location: 'token-in-header' });
     });
 
     it('with the proper API parameters (cookie & no csrf protection).', () => {
-      testParameters({ cookie: true });
+      testParameters({ location: 'token-in-cookie' });
     });
 
     it('with the proper API parameters (cookie & csrf protection).', () => {
       Config.set('settings.jwt.csrf.enabled', true);
 
-      @JWT({ cookie: true })
+      @JWT({ location: 'token-in-cookie' })
       class Foobar {}
 
       const csrfCookieParameter: IApiCookieParameter = {
@@ -1121,7 +1122,7 @@ export function testSuite(JWT: typeof JWTOptional|typeof JWTRequired, required: 
       Config.set('settings.jwt.csrf.enabled', true);
       Config.set('settings.jwt.csrf.cookie.name', csrfCookieName);
 
-      @JWT({ cookie: true })
+      @JWT({ location: 'token-in-cookie' })
       class Foobar {}
 
       const csrfCookieParameter: IApiCookieParameter = {

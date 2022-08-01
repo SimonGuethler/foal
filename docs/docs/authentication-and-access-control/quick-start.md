@@ -372,7 +372,7 @@ import { JWTRequired } from '@foal/jwt';
 import { User } from './entities';
 
 @JWTRequired({
-  cookie: true,
+  location: 'token-in-cookie',
   // Add the line below if you prefer ctx.user
   // to be an instance of User instead of the JWT payload.
   // user: fetchUser(User)
