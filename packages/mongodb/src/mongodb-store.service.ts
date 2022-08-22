@@ -1,4 +1,4 @@
-import { Config, SessionAlreadyExists, SessionState, SessionStore } from '@foal/core';
+import { Config, SessionAlreadyExists, SessionState, SessionStore, SessionUtils } from '@foal/core';
 import { MongoClient } from 'mongodb';
 
 interface DatabaseSession {
@@ -100,7 +100,9 @@ export class MongoDBStore extends SessionStore {
   }
 
   async getSessionsOf(user: { id: string }): Promise<DatabaseSession[]> {
-    // TODO: Clear expired Sessions?
+    const { inactivityTimeout, absoluteTimeout } = SessionUtils.getTimeouts();
+    await this.cleanUpExpiredSessions(inactivityTimeout, absoluteTimeout);
+
     return await this.collection.find({
       'state.userId': user.id.toString()
     }).toArray()

@@ -4,3 +4,4 @@ export { readSession } from './read-session';
 export { Store, SessionStore, SessionAlreadyExists } from './session-store';
 export { Session } from './session';
 export { SessionState } from './session-state.interface';
+export * as SessionUtils from './utils';

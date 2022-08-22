@@ -100,16 +100,17 @@ describe('MongoDBStore', () => {
     let maxInactivity: number;
 
     function createState(): SessionState {
+      const dateNow = Math.trunc(Date.now() / 1000);
       return {
         content: {
           foo: 'bar'
         },
-        createdAt: 0,
+        createdAt: dateNow,
         flash: {
           hello: 'world'
         },
         id: 'xxx',
-        updatedAt: 0,
+        updatedAt: dateNow,
         userId: null,
       };
     }
@@ -502,6 +503,13 @@ describe('MongoDBStore', () => {
             ...createState(),
             id: 'zzz',
             userId: 'asdf'
+          },
+          {
+            ...createState(),
+            id: 'www',
+            userId: 'asdf',
+            updatedAt: 0,
+            createdAt: 0
           },
         ];
 

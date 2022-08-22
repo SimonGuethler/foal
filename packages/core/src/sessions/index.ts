@@ -6,5 +6,6 @@ export {
   SessionAlreadyExists,
   Session,
   SessionState,
+  SessionUtils,
 } from './core';
 export { UseSessions, FetchUser } from './http';
